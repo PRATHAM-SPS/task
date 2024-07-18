@@ -1,54 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import axios from "axios";
 
-function CredentialsPopup({ connector, onSubmit }) {
-  const [host, setHost] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [database, setDatabase] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const [spaceId, setSpaceId] = useState('');
+const CredentialsPopup = ({ onSubmit }) => {
+  const [creds, setCreds] = useState({
+    connector: "",
+    username: "",
+    password: "",
+    host: "",
+    database: "",
+    spaceId: "",
+    apiKey: "",
+  });
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCreds((prevCreds) => ({
+      ...prevCreds,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (connector === 'mongodb') {
-      onSubmit({ host, username, password, database });
-    } else if (connector === 'contentful') {
-      onSubmit({ apiKey, spaceId });
-    }
+    await onSubmit(creds);
   };
 
   return (
-    <div className="popup">
+    <div className="popup" style={{ position: "fixed", top: "10px", left: "65%", transform: "translateX(-50%)" }}>
+      <h2>Enter Credentials</h2>
       <form onSubmit={handleSubmit}>
-        {connector === 'mongodb' && (
+        <label>
+          Connector:
+          <select name="connector" value={creds.connector} onChange={handleChange}>
+            <option value="">Select Connector</option>
+            <option value="mongodb">MongoDB</option>
+            <option value="contentful">Contentful</option>
+          </select>
+        </label>
+        {creds.connector === "mongodb" && (
           <>
+          <br />
             <label>
-              Host:
-              <input type="text" value={host} onChange={(e) => setHost(e.target.value)} />
-            </label>
-            <label>
+              
               Username:
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+              <input type="text" name="username" value={creds.username} onChange={handleChange} />
             </label>
+            <br />
             <label>
               Password:
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <input type="password" name="password" value={creds.password} onChange={handleChange} />
             </label>
+            <br />
+            <label>
+              Host:
+              <input type="text" name="host" value={creds.host} onChange={handleChange} />
+            </label>
+            <br />
             <label>
               Database:
-              <input type="text" value={database} onChange={(e) => setDatabase(e.target.value)} />
+              <input type="text" name="database" value={creds.database} onChange={handleChange} />
             </label>
           </>
         )}
-        {connector === 'contentful' && (
+        {creds.connector === "contentful" && (
           <>
-            <label>
-              API Key:
-              <input type="text" value={apiKey} onChange={(e) => setApiKey(e.target.value)} />
-            </label>
+          <br />
             <label>
               Space ID:
-              <input type="text" value={spaceId} onChange={(e) => setSpaceId(e.target.value)} />
+              <input type="text" name="spaceId" value={creds.spaceId} onChange={handleChange} />
+            </label>
+            <br />
+            <label>
+              API Key:
+              <input type="text" name="apiKey" value={creds.apiKey} onChange={handleChange} />
             </label>
           </>
         )}
@@ -56,6 +80,6 @@ function CredentialsPopup({ connector, onSubmit }) {
       </form>
     </div>
   );
-}
+};
 
 export default CredentialsPopup;
